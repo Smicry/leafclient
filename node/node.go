@@ -5,7 +5,6 @@ import (
 	"leafclient/conf"
 	"github.com/name5566/leaf/log"
 	"encoding/json"
-	"net"
 	"reflect"
 )
 
@@ -75,18 +74,6 @@ func (a *Agent) WriteMsg(msg interface{}) {
 
 func (a *Agent) OnClose() {
 	a.conn.Close()
-}
-
-func (a *Agent) LocalAddr() net.Addr {
-	return a.conn.LocalAddr()
-}
-
-func (a *Agent) RemoteAddr() net.Addr {
-	return a.conn.RemoteAddr()
-}
-
-func (a *Agent) Destroy() {
-	a.conn.Destroy()
 }
 
 func Destroy() {
