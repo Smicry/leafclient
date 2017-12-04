@@ -14,7 +14,7 @@ var (
 	HandshakeTimeout        = 10 * time.Second
 
 	// wechat login
-	Unioinids []string = []string{
+	Unioinids = []string{
 		"o8c-nt6tO8aIBNPoxvXOQTVJUxY0",
 		"o8c-ntxW4cW601v6RjaAsExy98w4",
 		"o8c-nt2jC5loIHg1BQGgYW6aqe60",

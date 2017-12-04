@@ -1,10 +1,10 @@
 package node
 
 import (
+	"encoding/json"
+	"github.com/name5566/leaf/log"
 	"github.com/name5566/leaf/network"
 	"leafclient/conf"
-	"github.com/name5566/leaf/log"
-	"encoding/json"
 	"reflect"
 )
 
@@ -17,21 +17,18 @@ type Agent struct {
 }
 
 func Online() {
-	for _, uid := range conf.Unioinids {
-		client := new(network.WSClient)
-		client.Addr = conf.WSAddr
-		client.ConnNum = conf.ConnNum
-		client.ConnectInterval = conf.ConnectInterval
-		client.PendingWriteNum = conf.PendingWriteNum
-		client.MaxMsgLen = conf.MaxMsgLen
-		client.HandshakeTimeout = conf.HandshakeTimeout
-		client.AutoReconnect = false
-		client.NewAgent = newAgent
+	client := new(network.WSClient)
+	client.Addr = conf.WSAddr
+	client.ConnNum = conf.ConnNum
+	client.ConnectInterval = conf.ConnectInterval
+	client.PendingWriteNum = conf.PendingWriteNum
+	client.MaxMsgLen = conf.MaxMsgLen
+	client.HandshakeTimeout = conf.HandshakeTimeout
+	client.AutoReconnect = false
+	client.NewAgent = newAgent
 
-		client.Start()
-		clients = append(clients, client)
-		log.Debug("client unioinid : %v online", uid)
-	}
+	client.Start()
+	clients = append(clients, client)
 }
 
 func newAgent(conn *network.WSConn) network.Agent {
@@ -41,6 +38,10 @@ func newAgent(conn *network.WSConn) network.Agent {
 }
 
 func (a *Agent) Run() {
+	a.ReadMsg()
+}
+
+func (a *Agent) ReadMsg() {
 	for {
 		data, err := a.conn.ReadMsg()
 		if err != nil {
@@ -51,7 +52,9 @@ func (a *Agent) Run() {
 		var body interface{}
 		err = json.Unmarshal(data, body)
 
-		if err != nil {
+		if err == nil {
+			// 处理body
+		} else {
 			log.Debug("unmarshal message error: %v", err)
 			break
 		}

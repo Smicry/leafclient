@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/name5566/leaf/log"
+	"leafclient/node"
 	"os"
 	"os/signal"
-	"leafclient/node"
 )
 
 const version = "0.0.1"
