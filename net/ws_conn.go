@@ -107,7 +107,7 @@ func (wsConn *WSConn) WriteMsg(msg interface{}) error {
 	}
 	msgID := msgType.Elem().Name()
 	m := map[string]interface{}{msgID: msg}
-	args, err := json.Marshal(m)
+	data, err := json.Marshal(m)
 	if err != nil {
 		return errors.New("marshal message error")
 	}
@@ -118,7 +118,7 @@ func (wsConn *WSConn) WriteMsg(msg interface{}) error {
 	}
 
 	// get len
-	msgLen := uint32(len(args))
+	msgLen := uint32(len(data))
 
 	// check len
 	if msgLen > wsConn.maxMsgLen {
@@ -127,6 +127,6 @@ func (wsConn *WSConn) WriteMsg(msg interface{}) error {
 		return errors.New("message too short")
 	}
 
-	wsConn.doWrite(args)
+	wsConn.doWrite(data)
 	return nil
 }
