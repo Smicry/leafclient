@@ -3,21 +3,20 @@ package node
 import (
 	"encoding/json"
 	"github.com/name5566/leaf/log"
-	"github.com/name5566/leaf/network"
 	"leafclient/conf"
-	"reflect"
+	"leafclient/net"
 )
 
 var (
-	clients []*network.WSClient
+	clients []*net.WSClient
 )
 
 type Agent struct {
-	conn *network.WSConn
+	conn *net.WSConn
 }
 
 func Online() {
-	client := new(network.WSClient)
+	client := new(net.WSClient)
 	client.Addr = conf.WSAddr
 	client.ConnNum = conf.ConnNum
 	client.ConnectInterval = conf.ConnectInterval
@@ -31,7 +30,7 @@ func Online() {
 	clients = append(clients, client)
 }
 
-func newAgent(conn *network.WSConn) network.Agent {
+func newAgent(conn *net.WSConn) net.Agent {
 	a := new(Agent)
 	a.conn = conn
 	return a
@@ -52,27 +51,20 @@ func (a *Agent) ReadMsg() {
 		var body interface{}
 		err = json.Unmarshal(data, body)
 
-		if err == nil {
-			// 处理body
-		} else {
+		if err != nil {
 			log.Debug("unmarshal message error: %v", err)
 			break
 		}
+
+		log.Debug("readMsg: %+v", body)
 	}
 }
 
 func (a *Agent) WriteMsg(msg interface{}) {
-
-	data, err := json.Marshal(msg)
+	err := a.conn.WriteMsg(msg)
 	if err != nil {
-		log.Error("marshal message %v error: %v", reflect.TypeOf(msg), err)
-		return
+		log.Debug("write message: %v", err)
 	}
-	err = a.conn.WriteMsg(data)
-	if err != nil {
-		log.Error("write message %v error: %v", reflect.TypeOf(msg), err)
-	}
-
 }
 
 func (a *Agent) OnClose() {

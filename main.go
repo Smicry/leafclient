@@ -7,11 +7,9 @@ import (
 	"os/signal"
 )
 
-const version = "0.0.1"
-
 func main() {
 	//logger
-	log.Release("Client %v starting up", version)
+	log.Release("Node starting up")
 
 	//clients online
 	node.Online()

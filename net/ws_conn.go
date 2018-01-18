@@ -1,10 +1,12 @@
-package network
+package net
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gorilla/websocket"
 	"github.com/name5566/leaf/log"
 	"net"
+	"reflect"
 	"sync"
 )
 
@@ -98,7 +100,17 @@ func (wsConn *WSConn) ReadMsg() ([]byte, error) {
 }
 
 // args must not be modified by the others goroutines
-func (wsConn *WSConn) WriteMsg(args ...[]byte) error {
+func (wsConn *WSConn) WriteMsg(msg interface{}) error {
+	msgType := reflect.TypeOf(msg)
+	if msgType == nil || msgType.Kind() != reflect.Ptr {
+		return errors.New("json message pointer required")
+	}
+	msgID := msgType.Elem().Name()
+	m := map[string]interface{}{msgID: msg}
+	args, err := json.Marshal(m)
+	if err != nil {
+		return errors.New("marshal message error")
+	}
 	wsConn.Lock()
 	defer wsConn.Unlock()
 	if wsConn.closeFlag {
@@ -106,10 +118,7 @@ func (wsConn *WSConn) WriteMsg(args ...[]byte) error {
 	}
 
 	// get len
-	var msgLen uint32
-	for i := 0; i < len(args); i++ {
-		msgLen += uint32(len(args[i]))
-	}
+	msgLen := uint32(len(args))
 
 	// check len
 	if msgLen > wsConn.maxMsgLen {
@@ -118,21 +127,6 @@ func (wsConn *WSConn) WriteMsg(args ...[]byte) error {
 		return errors.New("message too short")
 	}
 
-	// don't copy
-	if len(args) == 1 {
-		wsConn.doWrite(args[0])
-		return nil
-	}
-
-	// merge the args
-	msg := make([]byte, msgLen)
-	l := 0
-	for i := 0; i < len(args); i++ {
-		copy(msg[l:], args[i])
-		l += len(args[i])
-	}
-
-	wsConn.doWrite(msg)
-
+	wsConn.doWrite(args)
 	return nil
 }

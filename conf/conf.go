@@ -6,18 +6,10 @@ import (
 
 var (
 	// client conf
-	WSAddr                  = "ws://127.0.0.1:3653"
+	WSAddr                  = "ws://192.168.1.34:3661"
 	ConnNum                 = 1
 	PendingWriteNum         = 2000
 	MaxMsgLen        uint32 = 4096
 	ConnectInterval         = 3 * time.Second
 	HandshakeTimeout        = 10 * time.Second
-
-	// wechat login
-	Unioinids = []string{
-		"o8c-nt6tO8aIBNPoxvXOQTVJUxY0",
-		"o8c-ntxW4cW601v6RjaAsExy98w4",
-		"o8c-nt2jC5loIHg1BQGgYW6aqe60",
-		"o8c-nt6xAZdXAwrQKQ-eIVLr8XRI",
-	}
 )
